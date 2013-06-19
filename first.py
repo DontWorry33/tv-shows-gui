@@ -119,13 +119,13 @@ class WatchTV:
                                 self.final = data[1]
                 '''
                 #writes the show/code to the database
-                
+                '''
                 if text:
                         self.database.add(self.final[1].lower(), self.final[0])
                         
                 #add show to current dictionary        
                 self.database.db[self.final[1].lower()]=str(self.final[0])
-
+                '''
 
         def e_request(self,name):
                 #http://www.primewire.ag/tv-5223-The-Mentalist
@@ -248,7 +248,8 @@ treeview5 = builder.get_object("treeview5")
 b_add = builder.get_object("b_add")
 #button b_search
 b_search = builder.get_object("b_search")
-
+#button option_add in win1
+option_add = builder.get_object("option_add")
 
 
 #entry t_search
@@ -343,11 +344,10 @@ def thread_o():
     m_options = treeview5.get_model()
     for x in shows.search(t_search.get_text()):
         gtk.gdk.threads_enter()
-        print x
-        print t_search.get_text().replace(" ",'+')
-        m_options.append((x))
+        print type(x),x
+        #print t_search.get_text().replace(" ",'+')
+        m_options.append((x[1],int(x[0])))
         gtk.gdk.threads_leave()
-        0
         
     
 def cb_shows(x):
