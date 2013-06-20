@@ -20,7 +20,7 @@ class DataBase:
                 print '---------------------------------------------'
                 #print self.db
                 for x in self.cursor.execute('SELECT * FROM shows'):
-                        yield "Show: {0} - ID: {1}".format(x[0].replace('-',' ').strip(), x[1])
+                        print "Show: {0} - ID: {1}".format(x[0].replace('-',' ').strip(), x[1])
                 print '---------------------------------------------'
                 
         def yieldDB(self):

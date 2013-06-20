@@ -4,6 +4,7 @@
  
 #self created modules
 from generatekey import *
+import database
 
 #default modules
 import re
@@ -21,15 +22,9 @@ class WatchTV:
         def __init__(self):
                 print "Generating Key...\n"
                 self._key = Key()
-                '''
-                if self._key.valid == False:
-                        raise KeyError("Key is not valid!")
-                else:
-                        print "Key Generated!\n"
-                '''        
-                self.allShows = {}
-                        
-                self.loadTextDataBase()
+     
+                self.database = database.DataBase()
+                
                 
                 self.baseLink = 'http://www.letmewatchthis.ch/'
                 self.searchLink = '?search_keywords='
@@ -37,20 +32,7 @@ class WatchTV:
                 self.key = self._key.key
                 self.sectionLink = '&search_section='
                 self.debug = False
-                
-        def loadTextDataBase(self):
-                print "Loading database...\n"
-                with open("database.txt",'r') as f:
-                        for x in f.readlines():
-                                items = x.split(":")
-                                self.allShows[items[0].lower()]=items[1].strip()
-                        
-                print "Database Loaded!"
-        
-        
-        def loadSQLDataBase(self):
-                pass
-        
+
         def _GetHost(self):
                 t_hosts = []
                 for x in self.bs_data.findAll('script',{'type':'text/javascript'}):
@@ -76,6 +58,20 @@ class WatchTV:
         
         
 
+        def keyExpirey(self,bsdata):
+                regenerate = raw_input("Would you like to get a new key (y/n)?: " )
+                if regenerate.lower() == 'y':
+                    self._key.getKey()
+                    self.key = self._key.key
+                    print "Do these two match?"
+                    print self.key
+                    with open('key.txt','r') as f:
+                        print f.readlines()[0]
+                    t=raw_input("y/n?: ")
+                    if t=='y':
+                        print "horrah! returning to main menu, try searching again\n\n\n"
+                        return;                
+
         def search(self,text=True):
                 try:
                         self.section = int(raw_input("Movie (1) or TV (2): "))
@@ -92,28 +88,18 @@ class WatchTV:
                 
                 #open url
                 self.url = urllib.urlopen(self.link).read()
+                print 'asdas'
                 
                 #parse url with BS
-                views = BeautifulSoup(self.url)
+                bsdata = BeautifulSoup(self.url)
                 
                 #check if key has expired (results will be ~50,000
-                for x in views.findAll("div", {"class":"number_movies_result"}):
+                for x in bsdata.findAll("div", {"class":"number_movies_result"}):
                     digits = re.findall(r'[\d+\,*\d+]+', x.string)
                     if int(''.join(digits).encode('utf-8').replace(',','')) > 1000:
                         print 'We have detected that your key is expired.'
-                        regenerate = raw_input("Would you like to get a new key (y/n)?: " )
-                        if regenerate.lower() == 'y':
-                            self._key.getKey()
-                            self.key = self._key.key
-                            print "Do these two match?"
-                            print self.key
-                            with open('key.txt','r') as f:
-                                print f.readlines()[0]
-                            t=raw_input("y/n?: ")
-                            if t=='y':
-                                print "horrah! returning to main menu, try searching again\n\n\n"
-                                return;
-                        
+                        self.keyExpirey(bsdata)
+                        return
                 
                 #Finds all shows that have codes
                 self.code = re.findall(r'watch-(\d+)([\-*\w+]+)',self.url)
@@ -131,22 +117,18 @@ class WatchTV:
                         if int(self.id) == data[0]:
                                 self.final = data[1]
          
-                #writes the show/code to the database (plaintxt right now)
+                #writes the show/code to the database
                 if text:
-                        if self.final[1] not in self.allShows:  
-                                with open('database.txt','a') as f:
-                                        f.write(self.final[1].lower()+":"+str(self.final[0])+"\n")
-                        else:
-                                print "\n\nShow already in database!"
-                
+                        self.database.add(self.final[1].lower(), self.final[0])
+                        
                 #add show to current dictionary        
-                self.allShows[self.final[1].lower()]=str(self.final[0])
+                self.database.db[self.final[1].lower()]=str(self.final[0])
 
 
         def watchShow(self,name, final=True):
             
                 #http://www.letmewatchthis.ch/tv-5223-The-Mentalist
-                self.tvLink = self.baseLink+'watch-'+self.allShows[name]+name
+                self.tvLink = self.baseLink+'watch-'+str(self.database.db[name])+name
                 
                 #open link
                 self.showData = urllib.urlopen(self.tvLink).read()
@@ -162,14 +144,21 @@ class WatchTV:
                     for x,y in zip(soup.findAll("span",{"class":"tv_episode_name"}),pattern):
                         
                         #print season/episode followed by name, formatted correctly
+                        
+                        '''
+                        Current BUGS:
+                        If episode has no name (blank on website), span class tv_episode_name does not exist
+                        therefor there is no entry for the name and it skips it.
+                        '''
                         print "Season {0} Episode {1} - {2}".format(y[0],y[1],x.string[2:].encode('utf-8').replace("&#039;","'"))
+                        
                 
                 #list for easy access
                 specshow = raw_input("Enter Season/Episode (ex: 5 1 for season 5 episode 1): ").split()
                 
                 #http://www.letmewatchthis.ch/tv-5223-the-mentalist/season-5-episode14
                 finalLink = "{0}tv-{1}{2}/season-{3}-episode-{4}".format(self.baseLink,
-                                                                        self.allShows[name],
+                                                                        self.database.db[name],
                                                                         name,
                                                                         specshow[0],
                                                                         specshow[1]
@@ -200,39 +189,83 @@ class WatchTV:
                 
                                                   
                 link_choice = int(raw_input("Enter the number beside the link you want: "))
-                print links[link_choice].split("&")[2].encode('utf-8')[4:]
-                instalink = base64.b64decode(links[link_choice].split("&")[2].encode('utf-8')[4:])
-                print instalink
-                webbrowser.open(instalink)                                              
+                directlink = base64.b64decode(links[link_choice].split("&")[2].encode('utf-8')[4:])
+                webbrowser.open(directlink)                                              
                 
 #show instance
+global shows
 shows = WatchTV()
 
 
-def p_searchShow(shows):
-        shows.search()
-def p_displayShows(shows):
-        for x,y in shows.allShows.iteritems():
-                print x,y 
-def p_printKey(shows):
-        print "Current key is: ", shows.key
-def p_genKey(shows):
-        shows._key.getKey()
-        shows.key = shows._key.key
-        print "You have successfully gotten a key"
-def p_watchShow(shows):
-        _show = raw_input("Enter show name to search for in database (if show not in database, please add!): ")
-        _show = '-'+_show.replace(' ','-').strip().lower()
-        if _show in shows.allShows:
-                print _show, shows.allShows[_show]
-                shows.watchShow(_show)
+def mainm():
+        while True:
+                main_menu = int(raw_input('''Choose a category:\n
+1)Watch TV!
+2)Database Options
+3)Key Options
+Choice: '''))
+                if main_menu == 1:
+                        tv_options()
+                if main_menu == 2:
+                        database_options()
+                if main_menu == 3:
+                        key_options()
                 
-d = {1:p_searchShow, 2:p_displayShows, 3:p_printKey, 4:p_genKey, 5: p_watchShow}
-while True:
-        d[int(raw_input('''\n\n\n\nWhat would you like to do:\n
-1)Search and add a show to the database\n
-2)View current shows in database\n
-3)View current Key\n
-4)Re-Generate Key(expirey only)\n
-5)Watch a show
-Choice: '''))](shows)
+
+def tv_options():
+        while True:
+                tv_opt = int(raw_input('''What would you like to do:\n
+1)Add show to database
+2)View TV Shows
+3)Watch TV
+4)Main Menu
+Choice: '''))
+                if tv_opt == 1:
+                        shows.search()
+                if tv_opt == 2:
+                        shows.database.display()
+                if tv_opt == 3:
+                        _show = raw_input("Enter show name: ")
+                        _show = '-'+_show.replace(' ','-').strip().lower()
+                        if _show in shows.database.db:
+                                print _show, shows.database.db[_show]
+                                shows.watchShow(_show)
+                if tv_opt == 4:
+                        return
+
+def database_options():
+        while True:
+                db_opt = int(raw_input('''What would you like to do:\n
+1)Check if a show is in the database
+2)Delete show from database
+3)View Database
+4)Main Menu
+Choice: '''))
+                if db_opt == 1:
+                        if (shows.database.find(raw_input("Enter show: ").lower())):
+                                print "Show in database!"
+                        else:
+                                print "Show not in database!"
+                if db_opt == 2:
+                        shows.database.delete(raw_input("Enter show: ").lower())
+                if db_opt == 3:
+                        shows.database.display()
+                if db_opt == 4:
+                        return
+                
+def key_options():
+        while True:
+                key_opt = int(raw_input('''What would you like to do: \n
+1)View key
+2)Grab new key (expirey)
+3)Main Menu
+Choice: '''))
+                if key_opt == 1:
+                        print "Current key: ",shows.key
+                if key_opt == 2:
+                        shows._key.getKey()
+                        shows.key = shows._key.key
+                        print "You have successfully gotten a key"
+                if key_opt == 3:
+                        return
+mainm()
