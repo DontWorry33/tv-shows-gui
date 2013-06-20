@@ -1,0 +1,27 @@
+*********
+MAJOR
+*********
+*Add key options/verification/expirey to GUI
+*Write shows to database after searching
+*Search through database for shows
+*Delete shows from database
+*Loading bar/symbol while waiting for data
+
+*********
+MINOR
+*********
+*Show recommended hosts
+*Add report links option
+
+*****************
+IF I AM NOT LAZY
+*****************
+*Have a "watched shows" category
+*Make code pretty
+*Local downloading of season/episode list (much faster)
+
+********
+BUGS
+********
+*If episode has no name (blank on website), span class tv_episode_name does not exist therefor there is no entry for the name and it skips it. (Line 144 watchshows2.py)
+*Links do not refresh.

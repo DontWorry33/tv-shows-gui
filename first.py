@@ -69,38 +69,28 @@ class WatchTV:
                     if t=='y':
                         print "horrah! returning to main menu, try searching again\n\n\n"
                         return;                
-
+        
+        
+        def keyExpirey(self):
+                bsdata = BeautifulSoup(self.url)
+                
+                #check if key has expired (results will be ~50,000)
+                for x in bsdata.findAll("div", {"class":"number_movies_result"}):
+                    digits = re.findall(r'[\d+\,*\d+]+', x.string)
+                    if int(''.join(digits).encode('utf-8').replace(',','')) > 1000:
+                        return True
+                return False
+                
+        
         def search(self,show,text=True):
-                '''
-                try:
-                        self.section = int(raw_input("Movie (1) or TV (2): "))
-                except ValueError:
-                        print "Program Exiting. Enter a number next time -.- "
-                        sys.exit(1)
-                '''
-                #fit the format for website
-                #self.show = raw_input("What show do you want to search for: ").replace(" ","+")
-                #print "Searching...\n"
+                #format show name
                 show = show.replace(" ","+")
                 #format URL properly
                 self.link = self.baseLink + self.searchLink + show + self.keyLink + self.key + self.sectionLink + '2'
                 
                 #open url
                 self.url = urllib.urlopen(self.link).read()
-                #print 'asdas'
                 
-                #parse url with BS
-                bsdata = BeautifulSoup(self.url)
-                
-                '''
-                #check if key has expired (results will be ~50,000
-                for x in bsdata.findAll("div", {"class":"number_movies_result"}):
-                    digits = re.findall(r'[\d+\,*\d+]+', x.string)
-                    if int(''.join(digits).encode('utf-8').replace(',','')) > 1000:
-                        print 'We have detected that your key is expired.'
-                        self.keyExpirey(bsdata)
-                        return
-                '''
                 #Finds all shows that have codes
                 self.code = re.findall(r'watch-(\d+)([\-*\w+]+)',self.url)
                 
