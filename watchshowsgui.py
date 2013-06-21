@@ -55,20 +55,11 @@ class WatchTV:
                 return t_links
         
         
-
-        def keyExpirey(self,bsdata):
-                regenerate = raw_input("Would you like to get a new key (y/n)?: " )
-                if regenerate.lower() == 'y':
-                    self._key.getKey()
-                    self.key = self._key.key
-                    print "Do these two match?"
-                    print self.key
-                    with open('key.txt','r') as f:
-                        print f.readlines()[0]
-                    t=raw_input("y/n?: ")
-                    if t=='y':
-                        print "horrah! returning to main menu, try searching again\n\n\n"
-                        return;                
+        
+        def genKey(self):
+                self._key.getKey()
+                self.key = self._key.key
+                return True               
         
         
         def keyExpirey(self):
@@ -94,28 +85,10 @@ class WatchTV:
                 #Finds all shows that have codes
                 self.code = re.findall(r'watch-(\d+)([\-*\w+]+)',self.url)
                 
-                #Displays Search Results
+                #Yields Search Results
                 for x in self.code:
                         yield x
 
-                #Pick which show you meant to search for
-                #self.id = raw_input('''\n\nYour query returned the following results above.
-                            #\nPlease indicate which show you chose with the number on the left: ''')
-                                 
-                #Sets self.final to the show/code you picked from above.
-                '''
-                for data in enumerate(self.code,1):
-                        if int(self.id) == data[0]:
-                                self.final = data[1]
-                '''
-                #writes the show/code to the database
-                '''
-                if text:
-                        self.database.add(self.final[1].lower(), self.final[0])
-                        
-                #add show to current dictionary        
-                self.database.db[self.final[1].lower()]=str(self.final[0])
-                '''
 
         def e_request(self,name):
                 #http://www.primewire.ag/tv-5223-The-Mentalist
@@ -132,15 +105,6 @@ class WatchTV:
                 
                 #iterate through season/episodes & names
                 for x,y in zip(soup.findAll("span",{"class":"tv_episode_name"}),pattern):
-                    
-                    #print season/episode followed by name, formatted correctly
-                    
-                    '''
-                    Current BUGS:
-                    If episode has no name (blank on website), span class tv_episode_name does not exist
-                    therefor there is no entry for the name and it skips it.
-                    '''
-                    #print "Season {0} Episode {1} - {2}".format(y[0],y[1],x.string[2:].encode('utf-8').replace("&#039;","'"))
                     yield (y[0],y[1],x.string[2:].encode('utf-8').replace("&#039;","'"))
 
         def watchShow(self, name, specshow):
@@ -176,21 +140,10 @@ class WatchTV:
                 for w,x,y,z in zip(range(len(hosts)),hosts, views, links):
                     if x == "HD Sponsor":
                         continue
-                    '''
-                    if not final:
-                        print "{0}) {1} - {2} -- http://www.primewire.ag{3}".format(w,x,y,z)  
-                    '''
-                    
-                    #print "{0}) {1} - {2}".format(w,x,y)
                     yield (w,x,y,z)
-                                                  
-                #link_choice = int(raw_input("Enter the number beside the link you want: "))
-                #directlink = base64.b64decode(links[link_choice].split("&")[2].encode('utf-8')[4:])
-                #webbrowser.open(directlink)                                              
-
+                                                
 
 shows = WatchTV()
-
 
 #create builder, load XML file created with glade
 builder = gtk.Builder()
@@ -199,6 +152,7 @@ builder.add_from_file("gtk/1channel.ui")
 #get window object
 win = builder.get_object('window')
 win.maximize()
+
 
 #get window1 object
 win2 = builder.get_object("window1")
@@ -249,6 +203,7 @@ t_search = builder.get_object("t_search")
 #text=0 is gchararray tv_name
 tv_name=gtk.TreeViewColumn("tv name",render_text,text=0)
 treeview1.append_column(tv_name)
+
 #text=1 is gulong tv_id
 tv_id=gtk.TreeViewColumn("id",render_text,text=1)
 treeview1.append_column(tv_id)
@@ -334,12 +289,28 @@ def thread_o():
     m_options = treeview5.get_model()
     for x in shows.search(t_search.get_text()):
         gtk.gdk.threads_enter()
-        print type(x),x
+        #print type(x),x
         #print t_search.get_text().replace(" ",'+')
         m_options.append((x[1],int(x[0])))
         gtk.gdk.threads_leave()
         
+def thread_k():
+    if shows.genKey() == True:
+        gtk.gdk.threads_enter()
+        keyd_ok = keyd.add_button("ok",gtk.RESPONSE_CLOSE)
+        keyd_ok.connect("clicked",lambda x: keyd.hide())
+        keyd.set_markup("Verified!")
+        gtk.gdk.threads_leave()
+
+
+def key_start():
+    global keyd
+    keyd = gtk.MessageDialog(win);
+    keyd.set_markup("Verifying Key")
     
+    threading.Thread(target=thread_k).start()
+    keyd.run()
+
 def cb_shows(x):
     #starts thread_e function in a new thread
     threading.Thread(target=thread_e,args=(x,)).start();
@@ -364,14 +335,14 @@ def cb_links(x):
 
 
 def cb_error(x):
-    test = gtk.MessageDialog(win);
-    test.set_markup("Please enter text in the search box");
-    test_ok = test.add_button("ok",gtk.RESPONSE_CLOSE)
-    test_ok.connect("clicked",lambda x: test.hide())
+    er = gtk.MessageDialog(win);
+    er.set_markup("Please enter text in the search box");
+    er_ok = er.add_button("ok",gtk.RESPONSE_CLOSE)
+    er_ok.connect("clicked",lambda x: er.hide())
     if len(t_search.get_text()) <= 0:
-        test.run()
+        er.run()
         return True
-    
+
 def cb_add(x):
     if (cb_error(x)):
         return
@@ -395,5 +366,8 @@ for x in shows.database.yieldDB():
 
 win.show_all()
 gtk.gdk.threads_init()
+key_start()
+
 gtk.main()
+
 

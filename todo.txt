@@ -1,7 +1,7 @@
 *********
 MAJOR
 *********
-*Add key options/verification/expirey to GUI
+*Add key options/verification/expirey to GUI -----Partly done-------
 *Write shows to database after searching
 *Search through database for shows
 *Delete shows from database
