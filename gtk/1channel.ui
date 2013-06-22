@@ -97,6 +97,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
+                        <property name="primary_icon_tooltip_text" translatable="yes">Search for TV Show</property>
                       </object>
                       <packing>
                         <property name="right_attach">3</property>
@@ -285,6 +286,12 @@
                       <placeholder/>
                     </child>
                     <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
                       <object class="GtkButton" id="button5">
                         <property name="label" translatable="yes">Add Show</property>
                         <property name="visible">True</property>
@@ -371,6 +378,19 @@
                 <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="option_close">
+                <property name="label" translatable="yes">Close</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
               </packing>
             </child>
           </object>

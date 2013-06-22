@@ -43,11 +43,12 @@ class DataBase:
         
         #deletion name
         def delete(self,d_name):
+                d_name = d_name.replace(" ",'-')
                 if self.find(d_name):
-                        d_name = '-'+d_name.replace(" ",'-')
+                        
                         print d_name
-                        self.cursor.execute('DELETE FROM shows WHERE names = {0}'.format('"'+d_name+'"'))
-                        self.cursor.execute('DELETE FROM shows WHERE ids = {0}'.format('"'+self.db[d_name]+'"'))
+                        self.cursor.execute('DELETE FROM shows WHERE names = {0}'.format('"'+str(d_name)+'"'))
+                        self.cursor.execute('DELETE FROM shows WHERE ids = {0}'.format('"'+str(self.db[d_name])+'"'))
                         del(self.db[d_name])
                         print "Show has been deleted!"
                         self.commit()
@@ -57,7 +58,8 @@ class DataBase:
         def find(self, ntf):
                 t_shows = [] #temporary show list
                 for x in self.yieldDB():
-                        if ntf == x[0].replace('-',' ').strip():
+                        print ntf,x[0]
+                        if ntf == x[0]:#.replace('-',' ').lstrip():
                                 return True
                 return False
         

@@ -194,7 +194,10 @@ b_add = builder.get_object("b_add")
 b_search = builder.get_object("b_search")
 #button option_add in win1
 option_add = builder.get_object("option_add")
-
+#button option_close in win1
+option_close = builder.get_object("option_close")
+#button b_delete
+b_delete = builder.get_object("b_delete")
 
 #entry t_search
 t_search = builder.get_object("t_search")
@@ -227,6 +230,17 @@ treeview4.append_column(tv_links)
 tv_options = gtk.TreeViewColumn("results",render_text,text=0)
 treeview5.append_column(tv_options)
 
+window_2_model = treeview5.get_model()
+
+
+
+#RELOAD SHOWS
+def refresh_db():
+    l_shows.clear()
+    for x in shows.database.yieldDB():
+        l_shows.append((x[0].replace('-',' '),x[1]))    
+
+#GET ITEMS IN TREEVIEWS
 def getItem(x):
     m_shows=x.get_model();
     return (m_shows.get_value( m_shows.get_iter_from_string(str(x.get_cursor()[0][0])),0),
@@ -234,66 +248,10 @@ def getItem(x):
 def getItem2(x,i):
     m=x.get_model();
     return m.get_value( m.get_iter_from_string(str(x.get_cursor()[0][0])),i)
-    
-def thread_e(x):
-    m_season = treeview2.get_model()
-    m_season.clear()
-    treeview3.get_model().clear()
-    treeview4.get_model().clear()
-    
-    repeat=''
-    #SeasonEpisodeName
-    global sen
-    sen=[]
-    #iterate over values, add seasons to liststore, episodes to other liststore
-    show=getItem(x)[0];
-    
-    for a,b,c in shows.e_request(show.replace(' ','-')):
-        #grab GTK lock
-        gtk.gdk.threads_enter()
-        
-        
-        if(show!=getItem(x)[0]):
-            #unlocks (due to clicking more than 1 show)
-            gtk.gdk.threads_leave();
-            break
-            
-        #multiple repeats due to 2 for loops
-        if(repeat=='' or repeat!=a):
-            m_season.append(("Season {0}".format(a),int(a)))
-            repeat=a
-        
-        #add data to list so no more request
-        sen.append((a,b,c))
-        
-        #unlocks
-        gtk.gdk.threads_leave();
 
-def thread_l():
-    m_links = treeview4.get_model()
-    m_links.clear()
-    s_id = getItem(treeview2)[1]
-    e_id = getItem(treeview3)[1]
-    
-    #HostLinksViews
-    global hlv
-    hlv=[]
-    
-    for a,b,c,d in shows.watchShow(getItem(treeview1)[0].replace(' ','-'),(s_id,e_id)):
-        gtk.gdk.threads_enter()
-        m_links.append(("Host: {0} - {1}".format(b,c),int(a)))
-        hlv.append((a,b,c,d))
-        gtk.gdk.threads_leave()
-    
-def thread_o():
-    m_options = treeview5.get_model()
-    for x in shows.search(t_search.get_text()):
-        gtk.gdk.threads_enter()
-        #print type(x),x
-        #print t_search.get_text().replace(" ",'+')
-        m_options.append((x[1],int(x[0])))
-        gtk.gdk.threads_leave()
-        
+
+
+#KEY VERIFICATION
 def thread_k():
     if shows.genKey() == True:
         gtk.gdk.threads_enter()
@@ -301,39 +259,48 @@ def thread_k():
         keyd_ok.connect("clicked",lambda x: keyd.hide())
         keyd.set_markup("Verified!")
         gtk.gdk.threads_leave()
-
-
 def key_start():
     global keyd
     keyd = gtk.MessageDialog(win);
-    keyd.set_markup("Verifying Key")
+    keyd.set_markup("Please wait while we get your key from the website.")
     
     threading.Thread(target=thread_k).start()
     keyd.run()
 
-def cb_shows(x):
-    #starts thread_e function in a new thread
-    threading.Thread(target=thread_e,args=(x,)).start();
+
+#DELETE SHOWS
+def delshow(x):
+    print getItem(treeview1)
+    shows.database.delete(getItem(treeview1)[0])
+    conf.hide()
+def cb_delete(x):
+    global conf
+    conf = gtk.MessageDialog(win)
+    conf.set_markup("Are you sure you want to delete this show?")
+    conf.add_button("yes",gtk.RESPONSE_CLOSE).connect("clicked", delshow)
+    conf.add_button("no",gtk.RESPONSE_CLOSE).connect("clicked", lambda x: conf.hide())
+    conf.run()
+    refresh_db()
     
-def cb_seasons(x):
-    m_episode = treeview3.get_model()
-    m_episode.clear()
-    treeview4.get_model().clear()
-    for x in sen:
-        if int(x[0])==getItem2(treeview2,1):
-            m_episode.append(("Episode {0} - {1}".format(x[1],x[2][1:].encode('utf-8').replace("&#039;","'")),int(x[1])))
-    
-def cb_episodes(x):
-    threading.Thread(target=thread_l).start()
-    
 
-def cb_links(x):
-    for y in hlv:
-        if getItem(treeview4)[1] in y:
-            webbrowser.open(base64.b64decode(y[3].split("&")[2].encode('utf-8')[4:]))
+#HIDE WIN2 (needed so win2 doesn't destruct everything in it)        
+def cb_close_win1(x):
+    win2.hide()
 
 
+#WRITE SEARCHED SHOWS TO DB
+def cb_write(x):
+    showcode = getItem(treeview5)
+    shows.database.add(showcode[0].lower(), int(showcode[1]))
+    shows.database.db[showcode[0].lower()]=int(showcode[1])
+    suc = gtk.MessageDialog(win)
+    suc.set_markup("Show has been successfully added!")
+    suc.add_button("ok",gtk.RESPONSE_CLOSE).connect("clicked",lambda x: suc.hide())
+    refresh_db()
+    suc.run()
 
+
+#ERROR DIALOG
 def cb_error(x):
     er = gtk.MessageDialog(win);
     er.set_markup("Please enter text in the search box");
@@ -343,14 +310,118 @@ def cb_error(x):
         er.run()
         return True
 
+
+#SEARCH FOR SHOWS TO ADD
+m_options = treeview5.get_model()
+def thread_o():
+    m_options = window_2_model
+    m_options.clear()
+    print m_options
+    for x in shows.search(t_search.get_text()):
+        gtk.gdk.threads_enter()
+        m_options.append((x[1],int(x[0])))
+        gtk.gdk.threads_leave()
 def cb_add(x):
     if (cb_error(x)):
         return
-    win2.show_all()
     threading.Thread(target=thread_o).start()
+    win2.show_all()
+
+
+#WHEN LINK IS CLICKED OPEN IN WEB BROWSER
+def cb_links(x):
+    for y in hlv:
+        if getItem(treeview4)[1] in y:
+            webbrowser.open(base64.b64decode(y[3].split("&")[2].encode('utf-8')[4:]))
+
+
+
+#WHEN EPISODE IS CLICKED LOAD LINKS
+def thread_l():
+    m_links = treeview4.get_model()
+    m_links.clear()
+    s_id = getItem(treeview2)[1]
+    e_id = getItem(treeview3)[1]
     
+    
+    
+    
+    #HostLinksViews
+    global hlv
+    hlv=[]
+    
+    for a,b,c,d in shows.watchShow(getItem(treeview1)[0].replace(' ','-'),(s_id,e_id)):
+        gtk.gdk.threads_enter()
+        if e_id != getItem(treeview3)[1]:
+            gtk.gdk.threads_leave()
+            break
+        m_links.append(("Host: {0} - {1}".format(b,c),int(a)))
+        hlv.append((a,b,c,d))
+        gtk.gdk.threads_leave()
+def cb_episodes(x):
+    threading.Thread(target=thread_l).start()
 
 
+
+#WHEN SEASON IS CLICKED LOAD EPISODES
+def cb_seasons(x):
+    m_episode = treeview3.get_model()
+    m_episode.clear()
+    treeview4.get_model().clear()
+    for x in sen:
+        if int(x[0])==getItem2(treeview2,1):
+            m_episode.append(("Episode {0} - {1}".format(x[1],x[2][1:].encode('utf-8').replace("&#039;","'")),int(x[1])))
+
+
+
+
+    
+#WHEN SHOW IS CLICKED LOAD SEASONS
+def thread_e(x):
+    #get listshow for treeview2 and clear
+    m_season = treeview2.get_model()
+    m_season.clear()
+    
+    #clear other liststores when switching shows
+    treeview3.get_model().clear()
+    treeview4.get_model().clear()
+    
+    #variable for nulling double repeat
+    repeat=''
+    
+    #SeasonEpisodeName
+    global sen
+    sen=[]
+    
+    #sets current show to the
+    show=getItem(treeview1)[0];
+    
+    #a = season number
+    #b = episode number
+    #c = episode title
+    for a,b,c in shows.e_request(show.replace(' ','-')):
+        
+        #grab GTK lock
+        gtk.gdk.threads_enter()
+        
+        #if the show dodes not match the current show (clicked more than once)
+        if(show!=getItem(treeview1)[0]):
+            #unlocks thread and breaks
+            gtk.gdk.threads_leave();
+            break
+            
+        #multiple repeats due to 2 for loops
+        if(repeat=='' or repeat!=a):
+            m_season.append(("Season {0}".format(a),int(a)))
+            repeat=a
+        
+        #add data to list to minimize number of requests
+        sen.append((a,b,c))
+        
+        #unlocks thread
+        gtk.gdk.threads_leave();
+def cb_shows(x):
+    threading.Thread(target=thread_e,args=(x,)).start();
 
 treeview1.connect("cursor-changed",cb_shows)
 treeview2.connect("cursor-changed",cb_seasons)
@@ -358,6 +429,10 @@ treeview3.connect("cursor-changed",cb_episodes)
 treeview4.connect("cursor-changed",cb_links)
 b_add.connect("clicked",cb_add)
 b_search.connect("clicked",cb_error)
+option_add.connect("clicked",cb_write)
+option_close.connect("clicked",cb_close_win1)
+b_delete.connect("clicked",cb_delete)
+
 
 for x in shows.database.yieldDB():
     l_shows.append((x[0].replace('-',' '), x[1]))
