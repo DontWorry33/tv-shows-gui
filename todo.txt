@@ -22,4 +22,3 @@ IF I AM NOT LAZY
 BUGS
 ********
 *If episode has no name (blank on website), span class tv_episode_name does not exist therefor there is no entry for the name and it skips it. (Line 144 watchshows2.py)
-*When links are loading and you change shows, crashes!
