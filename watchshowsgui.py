@@ -233,7 +233,6 @@ treeview5.append_column(tv_options)
 window_2_model = treeview5.get_model()
 
 
-
 #RELOAD SHOWS
 def refresh_db():
     l_shows.clear()
@@ -349,9 +348,12 @@ def thread_l():
     #HostLinksViews
     global hlv
     hlv=[]
-    
+    show = getItem(treeview1)[0]
     for a,b,c,d in shows.watchShow(getItem(treeview1)[0].replace(' ','-'),(s_id,e_id)):
         gtk.gdk.threads_enter()
+        if show!=getItem(treeview1)[0]:
+            gtk.gdk.threads_leave()
+            break
         if e_id != getItem(treeview3)[1]:
             gtk.gdk.threads_leave()
             break
@@ -375,7 +377,7 @@ def cb_seasons(x):
 
 
 
-    
+        
 #WHEN SHOW IS CLICKED LOAD SEASONS
 def thread_e(x):
     #get listshow for treeview2 and clear
@@ -400,7 +402,6 @@ def thread_e(x):
     #b = episode number
     #c = episode title
     for a,b,c in shows.e_request(show.replace(' ','-')):
-        
         #grab GTK lock
         gtk.gdk.threads_enter()
         
