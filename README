@@ -1,6 +1,6 @@
 This program uses primewire.ag to grab tv-shows and other data and puts it all into a very user friendly GUI. It enables you to watch any tv-show just as you would on the website. It also lets you create a custom database of tv shows so you can track the ones you watch. It contains no ads and may even be faster than the website for some people since it does not to have load any images.
 
-The GUI has basic functionality but it incomplete. (watchshowsgui.py)
+The GUI has basic functionality but is incomplete. (watchshowsgui.py)
 
 A fully functional console version of this program is available as well. (watchshows.py)
 
