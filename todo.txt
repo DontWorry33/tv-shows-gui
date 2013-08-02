@@ -2,7 +2,7 @@
 MAJOR
 *********
 *Add key options/verification/expirey to GUI -PARTIALLY DONE
-*Search through database for shows
+*Search through database for shows -DONE THE LAZY WAY (hit search to find it, no search as you type yet)
 *Loading bar/symbol while waiting for data
 
 *********

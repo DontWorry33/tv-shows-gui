@@ -199,6 +199,8 @@ option_close = builder.get_object("option_close")
 #button b_delete
 b_delete = builder.get_object("b_delete")
 
+
+
 #entry t_search
 t_search = builder.get_object("t_search")
 
@@ -271,6 +273,9 @@ def key_start():
 def delshow(x):
     print getItem(treeview1)
     shows.database.delete(getItem(treeview1)[0])
+    treeview2.get_model().clear()
+    treeview3.get_model().clear()
+    treeview4.get_model().clear()
     conf.hide()
 def cb_delete(x):
     global conf
@@ -299,6 +304,18 @@ def cb_write(x):
     suc.run()
 
 
+#SEARCH BAR (EXPERIMENTAL)
+def cb_search(x):
+    find_show = t_search.get_text()
+    find_show = '-'+find_show.replace(' ','-')
+    for x,y in shows.database.db.iteritems():
+        if find_show in x:
+            l_shows.clear()
+            l_shows.append((x.replace('-',' '),y))
+    if len(t_search.get_text()) <= 0:
+        refresh_db()
+        
+        
 #ERROR DIALOG
 def cb_error(x):
     er = gtk.MessageDialog(win);
@@ -404,7 +421,12 @@ def thread_e(x):
     for a,b,c in shows.e_request(show.replace(' ','-')):
         #grab GTK lock
         gtk.gdk.threads_enter()
-        
+        try:
+            getItem(treeview1)[0]
+        except Exception as e:
+            #print "ERROR: ", e,type(e)
+            gtk.gdk.threads_leave()
+            break
         #if the show dodes not match the current show (clicked more than once)
         if(show!=getItem(treeview1)[0]):
             #unlocks thread and breaks
@@ -429,7 +451,7 @@ treeview2.connect("cursor-changed",cb_seasons)
 treeview3.connect("cursor-changed",cb_episodes)
 treeview4.connect("cursor-changed",cb_links)
 b_add.connect("clicked",cb_add)
-b_search.connect("clicked",cb_error)
+b_search.connect("clicked",cb_search)
 option_add.connect("clicked",cb_write)
 option_close.connect("clicked",cb_close_win1)
 b_delete.connect("clicked",cb_delete)
