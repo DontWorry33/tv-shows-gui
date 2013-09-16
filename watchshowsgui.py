@@ -349,7 +349,7 @@ def cb_links(x):
     for y in hlv:
         if getItem(treeview4)[1] in y:
             webbrowser.open(base64.b64decode(y[3].split("&")[2].encode('utf-8')[4:]))
-
+        
 
 
 #WHEN EPISODE IS CLICKED LOAD LINKS

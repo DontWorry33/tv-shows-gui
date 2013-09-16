@@ -12,14 +12,18 @@ MINOR
 *Add report links option
 
 *****************
-IF I AM NOT LAZY
+MORE
 *****************
-*Have a "watched shows" category
-*Make code pretty -Organized it bit..
-*Local downloading of season/episode list (much faster)
+*Have a "watched shows" category 
+    - checkboxes (check to mark watched, uncheck to unmark)
+    - display/hide watched episodes
+    - marked as watch after clicking link (pop-up box to confirm)
+    
+
+     
+*Downloading of season/episode list and save it locally for future use (much faster)
 
 ********
 BUGS
 ********
 *If episode has no name (blank on website), span class tv_episode_name does not exist therefor there is no entry for the name and it skips it. (Line 144 watchshows2.py)
-*When links are loading and you change shows, crashes!
