@@ -1,7 +1,7 @@
 *********
 MAJOR
 *********
-*Add key options/verification/expirey to GUI -PARTIALLY DONE
+*Add key options/verification/expirey to GUI - PARTIALLY DONE
 *Search through database for shows -DONE THE LAZY WAY (hit search to find it, no search as you type yet)
 *Loading bar/symbol while waiting for data
 
@@ -19,6 +19,15 @@ MORE
     - display/hide watched episodes
     - marked as watch after clicking link (pop-up box to confirm)
     
+*Release date
+    - Text version implemented, if link is clicked, will show release date in terminal.
+    	- Need to add column in episode box (internally) so it will display the dates.
+    	
+    - Have category next to "epside" in third box from left which shows date
+
+*New episodes
+    - If there is a show in local DB with new ep's, program should notify
+
 
      
 *Downloading of season/episode list and save it locally for future use (much faster)
@@ -27,3 +36,5 @@ MORE
 BUGS
 ********
 *If episode has no name (blank on website), span class tv_episode_name does not exist therefor there is no entry for the name and it skips it. (Line 144 watchshows2.py)
+
+*In GUI currently, when there is a mass amount of links, the GUI expands vertically and you are unable to un-expand it. To fix, add scrolling bar to links box (very right box)

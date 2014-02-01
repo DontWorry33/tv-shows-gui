@@ -1,28 +1,18 @@
-<<<<<<< HEAD
 ------------------
 ABOUT THE PROGRAM
 ------------------
 
-This program uses primewire.ag to grab tv-shows and other data and puts it all into a very user friendly GUI. It enables you to watch any tv-show just as you would on the website, except it contains a local databse of TV shows which you can add to. It contains no ads and may even be faster than the website for some people since it does not have load any images.
-=======
 This program uses primewire.ag to grab tv-shows and other data and puts it all into a very user friendly GUI. It enables you to watch any tv-show just as you would on the website. It also lets you create a custom database of tv shows so you can track the ones you watch. It contains no ads and may even be faster than the website for some people since it does not to have load any images.
-
-The GUI has basic functionality but is incomplete. (watchshowsgui.py)
->>>>>>> 285181e5f765f8d6bcd2271324a03c92bac09c8e
 
 The GUI has basic functionality. You can choose a TV show and pick a season/episode and watch the show. To access the GUI version of the program, run watchshowsgui.py
 
-<<<<<<< HEAD
 A console version of this program is available as well. It will not be updated anymore. To use this, run watchshows.py
 
-View todo.txt to see what is going to be added.
+View todo.txt to see what might be added.
 
 -----------------
 REQUIREMENTS
 -----------------
-=======
-This app is under constant development and will be updated very frequently.
->>>>>>> 285181e5f765f8d6bcd2271324a03c92bac09c8e
 
 PyGTK (Only for GUI application)
 BeautifulSoup 3 (3.2.1 was used)

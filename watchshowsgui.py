@@ -53,6 +53,13 @@ class WatchTV:
                     if 'a href' in unicode(x('a')):
                         t_links.append(unicode(x('a'))[10:].replace('amp;','').split('"')[0])
                 return t_links
+
+        def _GetReleaseDate(self):
+                t_dates = []
+                dirty_date = re.findall(r'<td>(\w+\s\d+\,\s\d+)',self.linkData)
+                print dirty_date;
+                #for x in self.linkData:
+                
         
         
         
@@ -135,13 +142,31 @@ class WatchTV:
                 
                 #grab links
                 links = self._GetLinks()
-                
+                self._GetReleaseDate()
                 #print formatted host/views
                 for w,x,y,z in zip(range(len(hosts)),hosts, views, links):
                     if x == "HD Sponsor":
                         continue
                     yield (w,x,y,z)
                                                 
+        def getAllDates(self, name, specshow):
+                #print name,specshow
+                #http://www.primewire.ag/tv-5223-the-mentalist/season-5-episode14
+                finalLink = "{0}tv-{1}{2}/season-{3}-episode-{4}".format(self.baseLink,
+                                                                        self.database.db[name],
+                                                                        name,
+                                                                        specshow[0],
+                                                                        specshow[1]
+                                                                        )
+                #open episode to get links
+                self.linkData = urllib.urlopen(finalLink).read()
+                t_dates = []
+                dirty_date = re.findall(r'<td>(\w+\s\d+\,\s\d+)',self.linkData)
+                d_list_dates=[]
+                d_list_dates.append((specshow[0],specshow[1],str(dirty_date)))
+		print specshow[0],specshow[1]+": "+name+" = ", ''.join(dirty_date);
+                
+                
 
 shows = WatchTV()
 
@@ -378,23 +403,30 @@ def thread_l():
         hlv.append((a,b,c,d))
         gtk.gdk.threads_leave()
 def cb_episodes(x):
+    #print treeview3.get_model().get_n_rows()
     threading.Thread(target=thread_l).start()
 
 
 
 #WHEN SEASON IS CLICKED LOAD EPISODES
 def cb_seasons(x):
+    for a,b,c in sen:
+            threading.Thread(target=getall,args=(getItem(treeview1)[0],a,b)).start();
+
     m_episode = treeview3.get_model()
     m_episode.clear()
     treeview4.get_model().clear()
     for x in sen:
+        #print int(x[0]), getItem2(treeview2,1);
         if int(x[0])==getItem2(treeview2,1):
             m_episode.append(("Episode {0} - {1}".format(x[1],x[2][1:].encode('utf-8').replace("&#039;","'")),int(x[1])))
 
 
 
 
-        
+def getall(show,a,b):
+    shows.getAllDates(show.replace(' ','-'),(a,b))
+    
 #WHEN SHOW IS CLICKED LOAD SEASONS
 def thread_e(x):
     #get listshow for treeview2 and clear
@@ -440,9 +472,9 @@ def thread_e(x):
         
         #add data to list to minimize number of requests
         sen.append((a,b,c))
-        
         #unlocks thread
         gtk.gdk.threads_leave();
+    
 def cb_shows(x):
     threading.Thread(target=thread_e,args=(x,)).start();
 

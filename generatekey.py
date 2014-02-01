@@ -13,8 +13,12 @@ class Key:
     def isValid(self):
         if os.path.isfile('key.txt'):
             with open('key.txt','r') as f:
-                t_key = f.readlines()[0]
-                
+                t_key=''
+                try:
+                    t_key = f.readlines()[0]
+                except:
+                    self.valid = False;
+                    self.getKey();
             if len(t_key) >= 1:
                 self.valid = True
                 self.key = t_key
@@ -31,7 +35,7 @@ class Key:
 
 
     def getKey(self):
-        source = 'http://www.letmewatchthis.ch'
+        source = 'http://www.primewire.ag'
         data = urllib.urlopen(source).read()
         keyL = re.findall(r'name="key" value="([\d+\w+]+)',data)
         self.key = ''.join(keyL)
