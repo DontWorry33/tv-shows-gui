@@ -143,9 +143,10 @@ class WatchTV:
                 #grab links
                 links = self._GetLinks()
                 self._GetReleaseDate()
+                print finalLink
                 #print formatted host/views
                 for w,x,y,z in zip(range(len(hosts)),hosts, views, links):
-                    if x == "HD Sponsor":
+                    if x == "HD Sponsor" or x=="Promo Host" or x=="Sponsor Host":
                         continue
                     yield (w,x,y,z)
                                                 
@@ -159,6 +160,7 @@ class WatchTV:
                                                                         specshow[1]
                                                                         )
                 #open episode to get links
+                
                 self.linkData = urllib.urlopen(finalLink).read()
                 t_dates = []
                 dirty_date = re.findall(r'<td>(\w+\s\d+\,\s\d+)',self.linkData)
@@ -373,7 +375,8 @@ def cb_add(x):
 def cb_links(x):
     for y in hlv:
         if getItem(treeview4)[1] in y:
-            webbrowser.open(base64.b64decode(y[3].split("&")[2].encode('utf-8')[4:]))
+            print base64.b64decode(y[3].split("&")[1].encode('utf-8')[4:])
+            webbrowser.open(base64.b64decode(y[3].split("&")[1].encode('utf-8')[4:]))
         
 
 
@@ -410,8 +413,8 @@ def cb_episodes(x):
 
 #WHEN SEASON IS CLICKED LOAD EPISODES
 def cb_seasons(x):
-    for a,b,c in sen:
-            threading.Thread(target=getall,args=(getItem(treeview1)[0],a,b)).start();
+    #for a,b,c in sen:
+     #       threading.Thread(target=getall,args=(getItem(treeview1)[0],a,b)).start();
 
     m_episode = treeview3.get_model()
     m_episode.clear()
