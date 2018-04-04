@@ -1,14 +1,20 @@
 ------------------
-ABOUT THE PROGRAM
+#ABOUT THE PROGRAM
 ------------------
 
-This program uses primewire.ag to grab tv-shows and other data and puts it all into a very user friendly GUI. It enables you to watch any tv-show just as you would on the website. It also lets you create a custom database of tv shows so you can track the ones you watch. It contains no ads and may even be faster than the website for some people since it does not to have load any images.
+This program allows users to watch any TV show hosted on primewire.ag, on a user-friendly GUI. 
+You may create a custom database of TV shows to track the ones you watch. 
+The program contains no ads and runs quickly, as no images are loaded.
 
-The GUI has basic functionality. You can choose a TV show and pick a season/episode and watch the show. To access the GUI version of the program, run watchshowsgui.py
+The GUI is simple to use. 
+Choose a TV show and select a season and episode to watch the show. 
+To access the GUI version of the program, run watchshowsgui.py
 
-A console version of this program is available as well. It will not be updated anymore. To use this, run watchshows.py
+A console version of this program is available as well. 
+It will no longer be updated. 
+To use the console version, run watchshows.py
 
-View todo.txt to see what might be added.
+Potential features can be viewed in todo.txt.
 
 -----------------
 REQUIREMENTS
@@ -26,24 +32,48 @@ HOW TO USE THE PROGRAM
 
 KEY VERIFICATION:
 
-As the program loads, it will grab a key from the website which is vital to add shows into the program. Depending on your internet connection and if the website is behaving it self, it can take up to 15 seconds to do. Generally (at least for me) it takes a few seconds max. If the message will not go away after 15 seconds, simply restart the program. A message box saying Verified will pop up if it completes successfully.
+The program will grab a key from PrimeWire as it loads. The key is necessary to add shows into the program. 
+Fetching the key can take up to 15 seconds. 
+If the loading message does not go away after 15 seconds, restart the program. 
+Once the program is finished loading, a message box saying "Verified" will appear.
 
 
 WATCHING SHOWS:
 
-The column on the very left is the list of shows currently in your local database. Click a show to load the seasons and episodes of that show. Click a season and you will be provided a list of episodes that reside with that season. After clicking an episode, the links of the episode will show on the column to the very right. Click a link and it will open up on your default webbrowser.
+The column on the far left of the program displays the shows currently in your local database. 
+Click a show to load the seasons and episodes. 
+Click a season and to view a list of episodes in that season. 
+After clicking an episode, the link to the episode will show on the column to the far right. 
+Click that link and the program will open up your default web browser.
 
 
 ADDING SHOWS:
 
-To add a show, type in a show name on the search bar. The search bar is located on the column to the very left just above the 3 buttons. If you do not type in a show and try to add the show, an error message will pop up telling you to enter text. Once you type in a show and click Add Show, another window will pop up. Depending on your internet connection and the website speed, it may take time for the data to pop up. Once it loads, you will see a list of shows that relate to what you typed. To add the show in your database, simply click the show you want and click Add. After clicking Add, a message box should pop up confirming that you have successfully added a show. VERY IMPORTANT: When you finish adding the show, DO NOT CLICK THE X ON THE TOP RIGHT CORNER. Click the Close button located to the right of Add button. Clicking the X will cause the add show function to not work the next time you try to add a new show.
+To add a show, type in a show name on the search bar. 
+The search bar is located on the column on the far left of the program, above the 3 buttons. 
+If the search bar is empty, an error message will appear. 
+After you type in a show name and click Add Show, another window will appear. 
+Once the window loads, you will see a list of shows that are related to your query. 
+To add a show into your database, click the show you want and click Add. 
+A message box should appear, confirming that you have successfully added a show. 
+**VERY IMPORTANT**: After you add a show, DO **NOT** CLICK THE X ON THE TOP RIGHT. 
+Click the Close button instead, located to the right of the Add button. 
+Clicking the X will break the Add Show function.
 
 DELETING SHOWS:
 
-To delete a show, click a show located on the left-most side. After clicking the show you wish to delete from the local database, click the Delete Show button. A confirmation message box will pop up asking if you are sure you want to delete the show. Click yes to delete and no to not delete it. Once you delete the show, it will not show up any more in the program. To get the show back, Add the show to the program. See ADDING SHOWS in the README. 
+Select the show you wish to delete. Shows are located on the left-most side of the program. 
+After clicking the show, click the Delete Show button.
+A confirmation message box will appear.
+Click yes to delete and no to cancel. 
+The show will no longer be viewable on the program once it is deleted. 
+To get the show back, you must re-add the show. See ADDING SHOWS. 
 
 
 SEARCHING FOR SHOWS:
 
-If you have a ton of shows in your database, scrolling through and looking for the show you want to watch may not be ideal for you. To search for a show in your database, type a show name in the text box located on the left-most side of the program above the 3 buttons. Click Search to start the search. If nothing happens, it means the show was not found. After searching for a show and finding it, simply remove all text from the text box and click Search again to show the list of all shows.
+Scrolling to find a show in your database can be time-consuming. Use the search bar instead.
+Type a show name in the search bar and click Search. 
+If nothing happens, the show was not found. 
+To return to the list of shows, remove all text from the search bar and click Search again.
 
